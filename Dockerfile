@@ -8,35 +8,33 @@ ARG SRC="${PKG}-${VER}.${OS}-${ARCH}"
 ARG UID="nobody"
 ARG GID="nobody"
 
-LABEL   ORG="Armedia LLC" \
-        APP="Prometheus Push Gateway" \
-        VERSION="${VER}" \
-        IMAGE_SOURCE="https://github.com/ArkCase/ark_prometheus_pushgate" \
-        MAINTAINER="Armedia LLC"
+LABEL ORG="Armedia LLC"
+LABEL MAINTAINER="Armedia LLC"
+LABEL APP="Prometheus Push Gateway"
+LABEL VERSION="${VER}"
+LABEL IMAGE_SOURCE="https://github.com/ArkCase/ark_prometheus_pushgate"
 
 # Modify to fetch from S3 ...
 RUN curl \
         -L "https://github.com/prometheus/${PKG}/releases/download/v${VER}/${SRC}.tar.gz" \
-        -o "package.tar.gz" && \
-    tar -xzvf "package.tar.gz" && \
-    mkdir -pv \
-        "/app/data" && \
-    mv -vif \
+        -o - | tar -xzvf -
+RUN mkdir -pv \
+        "/app/data"
+RUN mv -vif \
         "${SRC}/LICENSE" \
-        "/LICENSE" && \
-    mv -vif \
+        "/LICENSE"
+RUN mv -vif \
         "${SRC}/NOTICE" \
-        "/NOTICE" && \
-    mv -vif \
+        "/NOTICE"
+RUN mv -vif \
         "${SRC}/pushgateway" \
-        "/bin/pushgateway" && \
-    chown -R "${UID}:${GID}" \
-        "/app/data" && \
-    chmod -R ug+rwX,o-rwx \
-        "/app/data" && \
-    rm -rvf \
-        "${SRC}" \
-        "package.tar.gz"
+        "/bin/pushgateway"
+RUN chown -R "${UID}:${GID}" \
+        "/app/data"
+RUN chmod -R ug+rwX,o-rwx \
+        "/app/data"
+RUN rm -rvf \
+        "${SRC}"
 
 USER        ${UID}
 EXPOSE      9091
